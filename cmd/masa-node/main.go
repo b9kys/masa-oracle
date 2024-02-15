@@ -14,6 +14,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 
 	masa "github.com/masa-finance/masa-oracle/pkg"
 	"github.com/masa-finance/masa-oracle/pkg/cicd_helpers"
@@ -22,6 +23,36 @@ import (
 	"github.com/masa-finance/masa-oracle/pkg/staking"
 	"github.com/masa-finance/masa-oracle/pkg/welcome"
 )
+
+func initConfig() {
+	viper.SetConfigName("config")      // name of config file (without extension)
+	viper.SetConfigType("yaml")        // REQUIRED if the config file does not have the extension in the name
+	viper.AddConfigPath("$HOME/.masa") // path to look for the config file in
+	viper.AddConfigPath(".")           // optionally look for config in the working directory
+	viper.AutomaticEnv()               // read in environment variables that match
+
+	// Setting up default values
+	viper.SetDefault("RPC_URL", "https://ethereum-sepolia.publicnode.com")
+	viper.SetDefault("PORT", "4001")
+	viper.SetDefault("UDP", "true")
+	viper.SetDefault("TCP", "false")
+
+	// Reading the config file
+	if err := viper.ReadInConfig(); err != nil {
+		logrus.Errorf("Error reading config file, %s", err)
+	}
+
+	// Setting up command line flags
+	viper.BindEnv("KEY_FILE")
+	viper.BindEnv("RPC_URL")
+	viper.BindEnv("BOOTNODES")
+	viper.BindEnv("PORT")
+	viper.BindEnv("UDP")
+	viper.BindEnv("TCP")
+	viper.BindEnv("STAKE_AMOUNT")
+
+	// Add other flags and environment variables as needed
+}
 
 func init() {
 	f, err := os.OpenFile("masa_oracle_node.log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0755)
@@ -58,6 +89,11 @@ func init() {
 }
 
 func main() {
+	initConfig()
+
+	// Use viper to access configurations
+	keyFilePath := viper.GetString("KEY_FILE")
+	rpcURL := viper.GetString("RPC_URL")
 	// log the flags
 	bootnodesList := strings.Split(bootnodes, ",")
 	logrus.Infof("Bootnodes: %v", bootnodesList)

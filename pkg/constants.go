@@ -2,50 +2,48 @@ package masa
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/libp2p/go-libp2p/core/protocol"
+	"github.com/spf13/viper"
 )
 
-const (
-	KeyFileKey           = "private.key"
-	CertPem              = "cert.pem"
-	Cert                 = "cert"
-	Peers                = "peerList"
-	masaPrefix           = "/masa"
-	oracleProtocol       = "oracle_protocol"
-	NodeDataSyncProtocol = "nodeDataSync"
-	NodeGossipTopic      = "gossip"
-	AdTopic              = "ad"
-	rendezvous           = "masa-mdns"
-	PortNbr              = "portNbr"
-	PageSize             = 25
-	NodeBackupFileName   = "nodeBackup.json"
-	NodeBackupPath       = "nodeBackupPath"
-	Version              = "v0.0.6-alpha"
-	DefaultRPCURL        = "https://ethereum-sepolia.publicnode.com"
-	Environment          = "ENV"
+var (
+	KeyFileKey           = viper.GetString("KeyFileKey")
+	CertPem              = viper.GetString("CertPem")
+	Cert                 = viper.GetString("Cert")
+	Peers                = viper.GetString("Peers")
+	Bootnodes            = viper.GetString("Bootnodes")
+	masaPrefix           = viper.GetString("masaPrefix")
+	oracleProtocol       = viper.GetString("oracleProtocol")
+	NodeDataSyncProtocol = viper.GetString("NodeDataSyncProtocol")
+	NodeGossipTopic      = viper.GetString("NodeGossipTopic")
+	AdTopic              = viper.GetString("AdTopic")
+	rendezvous           = viper.GetString("rendezvous")
+	PortNbr              = viper.GetString("PortNbr")
+	PageSize             = viper.GetInt("PageSize")
+	NodeBackupFileName   = viper.GetString("NodeBackupFileName")
+	NodeBackupPath       = viper.GetString("NodeBackupPath")
+	Version              = viper.GetString("Version")
+	DefaultRPCURL        = viper.GetString("DefaultRPCURL")
+	Environment          = viper.GetString("Environment")
 )
 
-var env string
+func init() {
+	viper.SetDefault("KeyFileKey", "private.key")
+	viper.SetDefault("CertPem", "cert.pem")
+	// Set defaults for all other variables similarly
+}
 
 func ProtocolWithVersion(protocolName string) protocol.ID {
-	if getEnv() == "" {
+	if Environment == "" {
 		return protocol.ID(fmt.Sprintf("%s/%s/%s", masaPrefix, protocolName, Version))
 	}
-	return protocol.ID(fmt.Sprintf("%s/%s/%s-%s", masaPrefix, protocolName, Version, getEnv()))
+	return protocol.ID(fmt.Sprintf("%s/%s/%s-%s", masaPrefix, protocolName, Version, Environment))
 }
 
 func TopicWithVersion(protocolName string) string {
-	if getEnv() == "" {
+	if Environment == "" {
 		return fmt.Sprintf("%s/%s/%s", masaPrefix, protocolName, Version)
 	}
-	return fmt.Sprintf("%s/%s/%s-%s", masaPrefix, protocolName, Version, getEnv())
-}
-
-func getEnv() string {
-	if env == "" {
-		env = os.Getenv(Environment)
-	}
-	return env
+	return fmt.Sprintf("%s/%s/%s-%s", masaPrefix, protocolName, Version, Environment)
 }
