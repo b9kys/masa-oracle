@@ -20,7 +20,7 @@ var (
 	AdTopic              = viper.GetString("AdTopic")
 	rendezvous           = viper.GetString("rendezvous")
 	PortNbr              = viper.GetString("PortNbr")
-	PageSize             = viper.GetInt("PageSize")
+	PageSize             = viper.GetFloat64("PageSize")
 	NodeBackupFileName   = viper.GetString("NodeBackupFileName")
 	NodeBackupPath       = viper.GetString("NodeBackupPath")
 	Version              = viper.GetString("Version")
@@ -31,6 +31,7 @@ var (
 func init() {
 	viper.SetDefault("KeyFileKey", "private.key")
 	viper.SetDefault("CertPem", "cert.pem")
+	viper.SetDefault("PageSize", 25)
 	// Set defaults for all other variables similarly
 }
 

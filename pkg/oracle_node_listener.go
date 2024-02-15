@@ -73,8 +73,8 @@ func (node *OracleNode) SendNodeDataPage(allNodeData []pubsub2.NodeData, stream 
 	totalRecords := len(allNodeData)
 	totalPages := int(math.Ceil(float64(totalRecords) / PageSize))
 
-	startIndex := pageNumber * PageSize
-	endIndex := startIndex + PageSize
+	startIndex := int(pageNumber) * int(PageSize)
+	endIndex := startIndex + int(PageSize)
 	if endIndex > totalRecords {
 		endIndex = totalRecords
 	}

@@ -90,11 +90,11 @@ func init() {
 
 func main() {
 	initConfig()
-
-	// Use viper to access configurations
-	keyFilePath := viper.GetString("KEY_FILE")
-	rpcURL := viper.GetString("RPC_URL")
-	// log the flags
+	// Retrieve configuration values from Viper
+	portNbr := viper.GetInt("PORT") // Assuming portNbr is an integer
+	udp := viper.GetBool("UDP")     // Assuming udp is a boolean
+	tcp := viper.GetBool("TCP")     // Assuming tcp is a boolean
+	bootnodes := viper.GetString("BOOTNODES")
 	bootnodesList := strings.Split(bootnodes, ",")
 	logrus.Infof("Bootnodes: %v", bootnodesList)
 	logrus.Infof("Port number: %d", portNbr)

@@ -136,7 +136,7 @@ func (node *OracleNode) Start() (err error) {
 	go node.ListenToNodeTracker()
 	go node.handleDiscoveredPeers()
 
-	node.DHT, err = myNetwork.WithDht(node.Context, node.Host, bootNodeAddrs, node.Protocol, masaPrefix, node.PeerChan, node.IsStaked)
+	node.DHT, err = myNetwork.WithDht(node.Context, node.Host, bootNodeAddrs, node.Protocol, protocol.ID(masaPrefix), node.PeerChan, node.IsStaked)
 	if err != nil {
 		return err
 	}

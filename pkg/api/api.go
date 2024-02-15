@@ -31,7 +31,7 @@ func (api *API) GetNodeDataHandler() gin.HandlerFunc {
 		}
 		pageSize, err := GetPathInt(c, "pageSize")
 		if err != nil {
-			pageSize = masa.PageSize
+			pageSize = int(masa.PageSize)
 		}
 
 		if api.Node == nil || api.Node.DHT == nil {
