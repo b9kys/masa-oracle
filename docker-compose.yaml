@@ -12,6 +12,7 @@ services:
     volumes:
       - .:/app
       - .masa-keys:/home/masa/.masa
+      - ./config.yaml:/home/masa/.masa/config.yaml
 
 volumes:
   masa-keys:
