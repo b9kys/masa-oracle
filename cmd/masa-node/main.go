@@ -36,14 +36,13 @@ func initConfig() {
 	viper.SetDefault("PORT", "4001")
 	viper.SetDefault("UDP", "true")
 	viper.SetDefault("TCP", "false")
+	viper.SetDefault("STAKE_AMOUNT", "1000")
 
 	// Reading the config file
 	if err := viper.ReadInConfig(); err != nil {
 		logrus.Errorf("Error reading config file, %s", err)
 	}
 
-	// Setting up command line flags
-	viper.BindEnv("KEY_FILE")
 	viper.BindEnv("RPC_URL")
 	viper.BindEnv("BOOTNODES")
 	viper.BindEnv("PORT")
@@ -94,17 +93,17 @@ func main() {
 	portNbr := viper.GetInt("PORT") // Assuming portNbr is an integer
 	udp := viper.GetBool("UDP")     // Assuming udp is a boolean
 	tcp := viper.GetBool("TCP")     // Assuming tcp is a boolean
+
 	bootnodes := viper.GetString("BOOTNODES")
 	bootnodesList := strings.Split(bootnodes, ",")
 	logrus.Infof("Bootnodes: %v", bootnodesList)
 	logrus.Infof("Port number: %d", portNbr)
 	logrus.Infof("UDP: %v", udp)
 	logrus.Infof("TCP: %v", tcp)
-
 	// Create a cancellable context
 	ctx, cancel := context.WithCancel(context.Background())
 
-	privKey, ecdsaPrivKey, ethAddress, err := crypto.GetOrCreatePrivateKey(os.Getenv(masa.KeyFileKey))
+	privKey, ecdsaPrivKey, ethAddress, err := crypto.GetOrCreatePrivateKey(viper.GetString("keyFilePath") + viper.GetString("keyFileKey"))
 	if err != nil {
 		logrus.Fatal(err)
 	}

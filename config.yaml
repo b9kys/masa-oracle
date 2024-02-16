@@ -1,5 +1,3 @@
-KeyFileKey: "private.key"
-CertPem: "cert.pem"
 Cert: "cert"
 Peers: "peerList"
 PortNbr: "portNbr"

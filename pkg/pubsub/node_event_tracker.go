@@ -12,6 +12,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/peer"
 	ma "github.com/multiformats/go-multiaddr"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 
 	"github.com/masa-finance/masa-oracle/pkg/crypto"
 )
@@ -202,7 +203,7 @@ func (net *NodeEventTracker) GetUpdatedNodes(since time.Time) []NodeData {
 
 func (net *NodeEventTracker) DumpNodeData() {
 	// Write the JSON data to a file
-	filePath := os.Getenv("nodeBackupPath")
+	filePath := viper.GetString("NodeBackupPath")
 	if filePath == "" {
 		filePath = fmt.Sprintf("%s_node_data.json", net.version)
 	}
@@ -215,7 +216,7 @@ func (net *NodeEventTracker) DumpNodeData() {
 
 func (net *NodeEventTracker) LoadNodeData() error {
 	// Read the JSON data from a file
-	filePath := os.Getenv("nodeBackupPath")
+	filePath := viper.GetString("NodeBackupPath")
 	if filePath == "" {
 		filePath = fmt.Sprintf("%s_node_data.json", net.version)
 	}

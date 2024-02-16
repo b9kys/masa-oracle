@@ -9,6 +9,7 @@ import (
 
 var (
 	KeyFileKey           = viper.GetString("KeyFileKey")
+	KeyFilePath          = viper.GetString("KeyFilePath")
 	CertPem              = viper.GetString("CertPem")
 	Cert                 = viper.GetString("Cert")
 	Peers                = viper.GetString("Peers")
@@ -29,10 +30,15 @@ var (
 )
 
 func init() {
-	viper.SetDefault("KeyFileKey", "private.key")
+	viper.SetDefault("KeyFilePath", "/home/masa/.masa/")
+	viper.SetDefault("KeyFileKey", "masa_oracle_key")
 	viper.SetDefault("CertPem", "cert.pem")
 	viper.SetDefault("PageSize", 25)
-	// Set defaults for all other variables similarly
+	viper.SetDefault("NodeBackupFileName", "node-backup.json")
+	viper.SetDefault("NodeBackupPath", "/home/masa/.masa") // This is the default path where the node backup file will be stored
+	viper.SetDefault("Version", "v1.0.0")                  // This is the default version of the protocol
+	viper.SetDefault("Environment", "test")
+	viper.SetDefault("DefaultRPCURL", "http://localhost:8545")
 }
 
 func ProtocolWithVersion(protocolName string) protocol.ID {
