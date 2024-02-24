@@ -31,17 +31,17 @@ func init() {
 	// Set default values and use constants for values used elsewhere in the application
 	viper.SetDefault("LOG_LEVEL", "info")
 	viper.SetDefault("LOG_FILEPATH", "masa_oracle_node.log")
-	viper.SetDefault(masa.PrivKeyFile, "masa_oracle_key")
-	viper.SetDefault(masa.MasaDir, filepath.Join(usr.HomeDir, ".masa"))
-	viper.SetDefault(masa.RpcUrl, "https://ethereum-sepolia.publicnode.com")
-	viper.SetDefault(masa.BootNodes, "")
+	viper.SetDefault("PRIVATE_KEY_FILE" "masa_oracle_key")
+	viper.SetDefault("MASA_DIR", filepath.Join(usr.HomeDir, ".masa"))
+	viper.SetDefault("RPC_URL", "https://ethereum-sepolia.publicnode.com")
+	viper.SetDefault("BOOTNODES", "")
 	viper.SetDefault("PORT_NBR", "4001")
 	viper.SetDefault("UDP", true)
 	viper.SetDefault("TCP", false)
 	viper.SetDefault("STAKE_AMOUNT", "1000")
 	// Add other default values as needed
 	// log the flags
-	bootnodesList := strings.Split(viper.GetString(masa.BootNodes), ",")
+	bootnodesList := strings.Split(viper.GetString("BOOTNODES"), ",")
 	logrus.Infof("1 Bootnodes: %v", bootnodesList)
 	logrus.Infof("1 Port number: %d", viper.GetInt("PORT_NBR"))
 	logrus.Infof("1 UDP: %v", viper.GetBool("UDP"))
@@ -89,16 +89,19 @@ func init() {
 func main() {
 
 	// log the flags
-	bootnodesList := strings.Split(viper.GetString(masa.BootNodes), ",")
+	bootnodesList := strings.Split(viper.GetString("BOOTNODES"), ",")
+	portNbr := viper.GetInt("PORT_NBR")
+	udp := viper.GetBool("UDP")
+	tcp := viper.GetBool("TCP")
 	logrus.Infof("Bootnodes: %v", bootnodesList)
-	logrus.Infof("Port number: %d", viper.GetInt("PORT_NBR"))
-	logrus.Infof("UDP: %v", viper.GetBool("UDP"))
-	logrus.Infof("TCP: %v", viper.GetBool("TCP"))
+	logrus.Infof("Port number: %d", portNbr)
+	logrus.Infof("UDP: %v", udp)
+	logrus.Infof("TCP: %v", tcp)
 
 	// Create a cancellable context
 	ctx, cancel := context.WithCancel(context.Background())
 
-	privKey, ecdsaPrivKey, ethAddress, err := crypto.GetOrCreatePrivateKey(filepath.Join(viper.GetString(masa.MasaDir), viper.GetString(masa.PrivKeyFile)))
+	privKey, ecdsaPrivKey, ethAddress, err := crypto.GetOrCreatePrivateKey(filepath.Join(viper.GetString("MASA_DIR"), viper.GetString("PRIVATE_KEY_FILE")))
 
 	if err != nil {
 		logrus.Fatal(err)
