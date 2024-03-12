@@ -15,6 +15,9 @@ RUN useradd -m -s /bin/bash masa && mkdir -p /home/masa/.masa && chown -R masa:m
 USER masa
 WORKDIR /home/masa
 
+# Copy the .env file into the container
+COPY --chown=masa:masa .env .
+
 # Copy and install Node.js dependencies for the contracts
 # Assuming your contracts directory is ready for copy at this stage
 COPY --chown=masa:masa contracts/ ./contracts/
@@ -39,9 +42,6 @@ RUN chmod +x /usr/bin/masa-node
 # Switch to 'masa' to run the application
 USER masa
 WORKDIR /home/masa
-
-# Copy the .env file into the container
-COPY --chown=masa:masa .env .
 
 # Expose necessary ports
 EXPOSE 4001
