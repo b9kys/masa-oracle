@@ -7,10 +7,16 @@
 ### Breaking Changes
 
 * Normalized all command line params to camelCase
+* Changed default model to ollama/*
 
 ### New Features
 
+* Added Cloudflare AI Workers for LLM compute
 * Implemented Record and OracleData struct to save events to persisted storage
+* Discord Scraper as pkg
+* Twitter Scraper as pkg
+* Reddit Scraper as pkg
+* Web Scraper as pkg
 
 ### Bug Fixes
 

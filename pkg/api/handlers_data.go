@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -42,9 +43,19 @@ func (api *API) GetLLMModelsHandler() gin.HandlerFunc {
 			string(config.Models.Mixtral),
 			string(config.Models.OpenChat),
 			string(config.Models.NeuralChat),
+			string(config.Models.CloudflareQwen15Chat),
+			string(config.Models.CloudflareLlama27bChatFp16),
+			string(config.Models.CloudflareLlama38bInstruct),
+			string(config.Models.CloudflareMistral7bInstruct),
+			string(config.Models.CloudflareMistral7bInstructV01),
+			string(config.Models.CloudflareOpenchat35_0106),
+			string(config.Models.CloudflareMicrosoftPhi2),
+			string(config.Models.HuggingFaceGoogleGemma7bIt),
+			string(config.Models.HuggingFaceNousresearchHermes2ProMistral7b),
+			string(config.Models.HuggingFaceTheblokeLlama213bChatAwq),
+			string(config.Models.HuggingFaceTheblokeNeuralChat7bV31Awq),
 		}
 		c.JSON(http.StatusOK, gin.H{"models": models})
-
 	}
 }
 
@@ -349,23 +360,28 @@ func (api *API) WebData() gin.HandlerFunc {
 	}
 }
 
+type LLMChat struct {
+	Model    string `json:"model,omitempty"`
+	Messages []struct {
+		Role    string `json:"role"`
+		Content string `json:"content"`
+	} `json:"messages,omitempty"`
+	Stream bool `json:"stream"`
+}
+
 // LlmChat handles requests for chatting with AI models hosted by ollama.
 // It expects a JSON request body with a structure formatted for the model. For example for Ollama:
 //
-//		{
-//		    "model": "llama3",
-//		    "messages": [
-//		        {
-//		            "role": "user",
-//		            "content": "why is the sky blue?"
-//		        }
-//		    ],
-//		    "stream": false
-//		}
-//
-//		{
-//	 	"query": "I just successfully staked my $MASA Tokens. It’s super easy. Choose your lock-up time and earn up to 25% APY in MASA rewards. @getmasafi"
-//		}
+//	{
+//	    "model": "llama3",
+//	    "messages": [
+//	        {
+//	            "role": "user",
+//	            "content": "why is the sky blue?"
+//	        }
+//	    ],
+//	    "stream": false
+//	}
 //
 // This function acts as a proxy, forwarding the request to hosted models and returning the proprietary structured response.
 // This is intended to be compatible with code that is looking to leverage a common payload for LLMs that is based on
@@ -382,7 +398,14 @@ func (api *API) LlmChat() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// we just want to proxy the request JSON directly to the endpoint we are calling.
 		body := c.Request.Body
-		bodyBytes, err := io.ReadAll(body)
+		var reqBody LLMChat
+		if err := json.NewDecoder(body).Decode(&reqBody); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		reqBody.Model = strings.TrimPrefix(reqBody.Model, "ollama/")
+		reqBody.Stream = false
+		bodyBytes, err := json.Marshal(reqBody)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
@@ -423,22 +446,43 @@ func (api *API) LlmChat() gin.HandlerFunc {
 	}
 }
 
+// LlmChatCf handles the Cloudflare LLM chat requests.
+// It reads the request body, appends a system message, and forwards the request to the configured LLM endpoint.
+// The response from the LLM endpoint is then returned to the client.
+//
+//	{
+//	    "model": "@cf/meta/llama-3-8b-instruct",
+//	    "messages": [
+//	        {
+//	            "role": "user",
+//	            "content": "why is the sky blue?"
+//	        }
+//	    ]
+//	}
+//
+// Models
+//
+//	@cf/qwen/qwen1.5-0.5b-chat
+//	@cf/meta/llama-2-7b-chat-fp16
+//	@cf/meta/llama-3-8b-instruct
+//	@cf/mistral/mistral-7b-instruct
+//	@cf/mistral/mistral-7b-instruct-v0.1
+//	@hf/google/gemma-7b-it
+//	@hf/nousresearch/hermes-2-pro-mistral-7b
+//	@hf/thebloke/llama-2-13b-chat-awq
+//	@hf/thebloke/neural-chat-7b-v3-1-awq
+//	@cf/openchat/openchat-3.5-0106
+//	@cf/microsoft/phi-2
+//
+// @return gin.HandlerFunc - the handler function for the LLM chat requests.
 func (api *API) LlmChatCf() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		body := c.Request.Body
-		var reqBody struct {
-			Query     string `json:"query,omitempty"`
-			MaxTokens int    `json:"max_tokens"`
-			Messages  []struct {
-				Role    string `json:"role"`
-				Content string `json:"content"`
-			} `json:"messages"`
-		}
+		var reqBody LLMChat
 		if err := json.NewDecoder(body).Decode(&reqBody); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		reqBody.MaxTokens = 2048
 		reqBody.Messages = append(reqBody.Messages, struct {
 			Role    string `json:"role"`
 			Content string `json:"content"`
@@ -450,27 +494,18 @@ func (api *API) LlmChatCf() gin.HandlerFunc {
 			Content: os.Getenv("PROMPT"),
 		})
 
-		reqBody.Messages = append(reqBody.Messages, struct {
-			Role    string `json:"role"`
-			Content string `json:"content"`
-		}{
-			Role:    "user",
-			Content: reqBody.Query,
-		})
-
-		reqBody.Query = ""
-
 		bodyBytes, err := json.Marshal(reqBody)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		model := "@cf/meta/llama-3-8b-instruct"
-		uri := fmt.Sprintf("%s%s", os.Getenv("LLM_CF_URL"), model)
-		if uri == "" {
+
+		cfUrl := config.GetInstance().LLMCfUrl
+		if cfUrl == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("missing env LLM_CF_URL")})
 			return
 		}
+		uri := fmt.Sprintf("%s%s", cfUrl, reqBody.Model)
 		req, err := http.NewRequest("POST", uri, bytes.NewReader(bodyBytes))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
