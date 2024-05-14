@@ -22,18 +22,6 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "securityDefinitions": {
-        "Bearer": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
-        }
-    },
-    "security": [
-        {
-            "Bearer": []
-        }
-    ],
     "paths": {
 			"/peers": {
 				"get": {
@@ -58,12 +46,7 @@ const docTemplate = `{
 								}
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				}
 			},
 			"/peer/addresses": {
@@ -89,12 +72,7 @@ const docTemplate = `{
 								}
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				}
 			},
 			"/ads": {
@@ -120,12 +98,7 @@ const docTemplate = `{
 								}
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				},
 				"post": {
 					"description": "Adds a new ad to the network",
@@ -163,12 +136,7 @@ const docTemplate = `{
 								"$ref": "#/definitions/ErrorResponse"
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				}
 			},
 			"/ads/subscribe": {
@@ -208,12 +176,7 @@ const docTemplate = `{
 								"$ref": "#/definitions/ErrorResponse"
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				}
 			},
 			"/data/twitter/profile/{username}": {
@@ -254,12 +217,7 @@ const docTemplate = `{
 								"$ref": "#/definitions/ErrorResponse"
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				}
 			},
 			"/data/twitter/tweets/recent": {
@@ -312,12 +270,7 @@ const docTemplate = `{
 								"$ref": "#/definitions/ErrorResponse"
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				}
 			},
 			"/data/twitter/tweets/trends": {
@@ -349,12 +302,7 @@ const docTemplate = `{
 								"$ref": "#/definitions/ErrorResponse"
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				}
 			},
 			"/data/web": {
@@ -404,12 +352,7 @@ const docTemplate = `{
 								"$ref": "#/definitions/ErrorResponse"
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				}
 			},
 			"/dht": {
@@ -447,12 +390,7 @@ const docTemplate = `{
 								"$ref": "#/definitions/ErrorResponse"
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				},
 				"post": {
 					"description": "Adds data to the DHT (Distributed Hash Table)",
@@ -498,12 +436,7 @@ const docTemplate = `{
 								"$ref": "#/definitions/ErrorResponse"
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				}
 			},
 			"/llm/models": {
@@ -532,12 +465,7 @@ const docTemplate = `{
 								"$ref": "#/definitions/ErrorResponse"
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				}
 			},
 			"/chat": {
@@ -577,12 +505,7 @@ const docTemplate = `{
 								"$ref": "#/definitions/ErrorResponse"
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				}
 			},
 			"/node/data": {
@@ -611,12 +534,7 @@ const docTemplate = `{
 								"$ref": "#/definitions/ErrorResponse"
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				}
 			},
 			"/node/data/{peerid}": {
@@ -654,12 +572,7 @@ const docTemplate = `{
 								"$ref": "#/definitions/ErrorResponse"
 							}
 						}
-					},
-					"security": [
-						{
-							"Bearer": []
-						}
-					]
+					}
 				}
 			},
 			"/sentiment/tweets": {

@@ -10,8 +10,6 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/google/uuid"
-
 	"github.com/masa-finance/masa-oracle/pkg/workers"
 
 	"github.com/sirupsen/logrus"
@@ -83,10 +81,12 @@ func main() {
 	}
 
 	// WIP
+	//models, _ := config.GetCloudflareModels()
+	//logrus.Info(models)
+
 	if os.Getenv("PG_URL") != "" {
 		type Work struct {
 			id      int64
-			uuid    string
 			payload json.RawMessage
 			raw     json.RawMessage
 		}
@@ -97,11 +97,11 @@ func main() {
 			logrus.Error(err)
 		}
 		defer database.Close()
-		uid := uuid.New().String()
-		insertQuery := `INSERT INTO "public"."work" ("uuid", "payload", "raw") VALUES ($1, $2, $3)`
-		payloadJSON := json.RawMessage(`{"request":"twitter", "query":"$MASA", "count":5, "model": "gpt-4"}`)
-		rawJSON := json.RawMessage(`{"tweets": ["twit", "twit"]}`)
-		_, err = database.Exec(insertQuery, uid, payloadJSON, rawJSON)
+
+		insertQuery := `INSERT INTO "public"."work" ("payload", "raw") VALUES ($1, $2)`
+		payloadJSON := json.RawMessage(`{"request":"twitter", "query":"$MASA", "count":5}`)
+		rawJSON := json.RawMessage(`{"tweets": []}`)
+		_, err = database.Exec(insertQuery, payloadJSON, rawJSON)
 		if err != nil {
 			logrus.Error(err)
 		}
@@ -124,10 +124,23 @@ func main() {
 			if err = rows.Scan(&id, &payload, &raw); err != nil {
 				log.Fatal(err)
 			}
-			data = append(data, Work{id, uid, payload, raw})
+			data = append(data, Work{id, payload, raw})
 		}
 		logrus.Infof("record from pg %s", data[0].payload)
 	}
+
+	// JWT
+	// jwtToken, err := consensus.GenerateJWTToken(node.Host.ID().String())
+	// if err != nil {
+	// 	logrus.Error(err)
+	// }
+	// logrus.Infof("jwt token: %s", jwtToken)
+	// JWT
+
+	// PoW
+	// apiKey := consensus.GeneratePoW(node.Host.ID().String())
+	// logrus.Infof("api key: %s", apiKey)
+	// PoW
 
 	// WIP
 

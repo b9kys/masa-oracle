@@ -54,14 +54,16 @@ type OracleData struct {
 	Id        string `json:"id"`
 	PeerId    string `json:"peer_id"`
 	Request   string `json:"request"`
-	ModelName string `json:"model_name,omitempty"`
+	Domain    string `json:"domain"`
+	ModelType string `json:"model_type"`
+	ModelName string `json:"model_name"`
 	Steps     []struct {
 		Idx               int    `json:"idx"`
-		RawContent        string `json:"raw_content,omitempty"`
-		StructuredContent string `json:"structured_content,omitempty"`
 		SystemPrompt      string `json:"system_prompt,omitempty"`
 		Timestamp         string `json:"timestamp"`
 		UserPrompt        string `json:"user_prompt,omitempty"`
+		RawContent        string `json:"raw_content,omitempty"`
+		StructuredContent string `json:"structured_content,omitempty"`
 	} `json:"steps"`
 }
 
@@ -104,31 +106,21 @@ func (a *Worker) Receive(ctx actor.Context) {
 			Id:        id,
 			PeerId:    m.Id,
 			Request:   workData["request"],
+			Domain:    workData["domain"],
+			ModelType: workData["modelType"],
 			ModelName: workData["model"],
 			Steps: []struct {
 				Idx               int    `json:"idx"`
-				RawContent        string `json:"raw_content,omitempty"`
-				StructuredContent string `json:"structured_content,omitempty"`
 				SystemPrompt      string `json:"system_prompt,omitempty"`
 				Timestamp         string `json:"timestamp"`
 				UserPrompt        string `json:"user_prompt,omitempty"`
+				RawContent        string `json:"raw_content,omitempty"`
+				StructuredContent string `json:"structured_content,omitempty"`
 			}{
 				{
 					Idx:        0,
 					Timestamp:  time.Now().String(),
-					RawContent: `Actor Started`,
-				},
-				{
-					Idx:          1,
-					RawContent:   `{"request": "twitter", "query": "$MASA", "count": 5}`,
-					SystemPrompt: `the sentiment prompt`,
-					Timestamp:    time.Now().String(),
-					UserPrompt:   `$MASA masa finance token price`,
-				},
-				{
-					Idx:        2,
-					Timestamp:  time.Now().String(),
-					RawContent: `Actor Stopped`,
+					RawContent: `{"request": "twitter", "query": "$MASA", "count": 5}`,
 				},
 			},
 		}

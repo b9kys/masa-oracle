@@ -11,11 +11,7 @@ import (
 	mh "github.com/multiformats/go-multihash"
 )
 
-// @todo WIP for future use case
-// PoW Usage
-// apiKey := consensus.GeneratePoW(node.Host.ID().String())
-// logrus.Infof("api key: %s", apiKey)
-// PoW
+// @todo WIP for later use cases
 
 func GeneratePoW(peerId string) string {
 	difficulty := 1
