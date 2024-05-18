@@ -30,6 +30,8 @@ func (c *AppConfig) SetupLogging() {
 
 	if c.LogLevel == "debug" {
 		logrus.SetLevel(logrus.DebugLevel)
+	} else if c.LogLevel == "error" {
+		logrus.SetLevel(logrus.ErrorLevel)
 	} else {
 		logrus.SetLevel(logrus.InfoLevel)
 	}

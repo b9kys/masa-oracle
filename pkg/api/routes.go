@@ -194,11 +194,11 @@ func SetupRoutes(node *masa.OracleNode) *gin.Engine {
 		// @Accept  json
 		// @Produce  json
 		// @Param   username   path    string  true  "Twitter Username"
-		// @Param   maxUsersNbr   query   int     false  "Maximum number of users to return"  default(20)
+		// @Param   count   query   int     false  "Maximum number of users to return"  default(20)
 		// @Success 200 {array} Profile "Array of profiles a user has as followers"
 		// @Failure 400 {object} ErrorResponse "Invalid username or error fetching followers"
 		// @Router /data/twitter/followers/{username} [get]
-		v1.GET("/data/twitter/followers/:username", API.GetTwitterFollowersHandler())
+		v1.GET("/data/twitter/followers/:username", API.SearchTwitterFollowers())
 
 		// @Summary Search Twitter Profile
 		// @Description Retrieves tweets from a specific Twitter profile
@@ -231,6 +231,28 @@ func SetupRoutes(node *masa.OracleNode) *gin.Engine {
 		// @Failure 400 {object} ErrorResponse "Error fetching Twitter trends"
 		// @Router /data/twitter/tweets/trends [get]
 		v1.GET("/data/twitter/tweets/trends", API.SearchTweetsTrends())
+
+		// @Summary Search Discord Profile
+		// @Description Retrieves a Discord user profile by user ID.
+		// @Tags Discord
+		// @Accept  json
+		// @Produce  json
+		// @Param   userID   path    string  true  "Discord User ID"
+		// @Success 200 {object} UserProfile "Successfully retrieved Discord user profile"
+		// @Failure 400 {object} ErrorResponse "Invalid user ID or error fetching profile"
+		// @Router /discord/profile/{userID} [get]
+		v1.GET("/data/discord/profile/:userID", API.SearchDiscordProfile())
+
+		// @Summary Search Discord Guild Memberships
+		// @Description Retrieves guild memberships for a Discord user by user ID.
+		// @Tags Discord
+		// @Accept  json
+		// @Produce  json
+		// @Param   userID   path    string  true  "Discord User ID"
+		// @Success 200 {array} GuildMember "Successfully retrieved guild memberships"
+		// @Failure 400 {object} ErrorResponse "Invalid user ID or error fetching guild memberships"
+		// @Router /discord/guilds/{userID} [get]
+		v1.GET("/data/discord/guilds/:userID", API.SearchDiscordGuildMemberships())
 
 		// @Summary Web Data
 		// @Description Retrieves data from the web

@@ -4,7 +4,11 @@ package discord
 import (
 	"encoding/json"
 	"fmt"
+<<<<<<< HEAD
 	"io/ioutil"
+=======
+	"io"
+>>>>>>> 130505d6f5c0c765df5eaa33baee64b035e8c1b0
 	"net/http"
 )
 
@@ -38,7 +42,11 @@ func GetUserProfile(userID, botToken string) (*UserProfile, error) {
 		return nil, fmt.Errorf("error fetching user profile, status code: %d", resp.StatusCode)
 	}
 
+<<<<<<< HEAD
 	body, err := ioutil.ReadAll(resp.Body)
+=======
+	body, err := io.ReadAll(resp.Body)
+>>>>>>> 130505d6f5c0c765df5eaa33baee64b035e8c1b0
 	if err != nil {
 		return nil, err
 	}
