@@ -24,9 +24,10 @@ import (
 	"github.com/ipfs/go-cid"
 
 	pubsub2 "github.com/libp2p/go-libp2p-pubsub"
-	mpubsub "github.com/masa-finance/masa-oracle/pkg/pubsub"
 	mh "github.com/multiformats/go-multihash"
 	"github.com/sirupsen/logrus"
+
+	mpubsub "github.com/masa-finance/masa-oracle/pkg/pubsub"
 )
 
 type WorkerType string
@@ -79,6 +80,7 @@ type ChanResponse struct {
 }
 
 type Worker struct {
+	manager *WorkHandlerManager
 }
 
 // NewWorker creates a new instance of the Worker actor.
@@ -88,7 +90,7 @@ type Worker struct {
 //   - An instance of the Worker struct that implements the actor.Receiver interface.
 func NewWorker() actor.Producer {
 	return func() actor.Actor {
-		return &Worker{}
+		return &Worker{manager: NewWorkHandlerManager()}
 	}
 }
 
@@ -368,6 +370,25 @@ func MonitorWorkers(ctx context.Context, node *masa.OracleNode) {
 	ticker := time.NewTicker(time.Second * 10)
 	defer ticker.Stop()
 	rcm := pubsub.GetResponseChannelMap()
+	if node.IsStaked {
+		if node.IsTwitterScraper {
+			GetWorkHandlerManager().AddWorkHandler(string(WORKER.Twitter), &TwitterQueryHandler{})
+			GetWorkHandlerManager().AddWorkHandler(string(WORKER.TwitterFollowers), &TwitterFollowersHandler{})
+			GetWorkHandlerManager().AddWorkHandler(string(WORKER.TwitterProfile), &TwitterProfileHandler{})
+			GetWorkHandlerManager().AddWorkHandler(string(WORKER.TwitterSentiment), &TwitterSentimentHandler{})
+			GetWorkHandlerManager().AddWorkHandler(string(WORKER.TwitterTrends), &TwitterTrendsHandler{})
+		}
+		if node.IsWebScraper {
+			GetWorkHandlerManager().AddWorkHandler(string(WORKER.Web), &WebHandler{})
+			GetWorkHandlerManager().AddWorkHandler(string(WORKER.WebSentiment), &WebSentimentHandler{})
+		}
+		if node.IsLlmServer {
+			GetWorkHandlerManager().AddWorkHandler(string(WORKER.LLMChat), &LLMChatHandler{})
+		}
+		if node.IsDiscordScraper {
+			GetWorkHandlerManager().AddWorkHandler(string(WORKER.Discord), &DiscordHandler{})
+		}
+	}
 	var validatorData []byte
 
 	for {
