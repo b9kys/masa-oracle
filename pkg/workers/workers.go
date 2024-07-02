@@ -193,7 +193,9 @@ func updateRecords(node *masa.OracleNode, workEvent db.WorkEvent) {
 	var nodeData pubsub.NodeData
 	nodeDataBytes, err := db.GetCache(context.Background(), workEvent.PeerId)
 	if err != nil {
-		nodeData = *node.NodeTracker.GetNodeData(workEvent.PeerId)
+		if workEvent.PeerId != "" {
+			nodeData = *node.NodeTracker.GetNodeData(workEvent.PeerId)
+		}
 	} else {
 		err = json.Unmarshal(nodeDataBytes, &nodeData)
 		if err != nil {
@@ -414,7 +416,7 @@ func MonitorWorkers(ctx context.Context, node *masa.OracleNode) {
 						logrus.Infof("[+] Work failed %s", response["error"])
 					} else if work, ok := response["data"].(string); ok {
 						key, _ := computeCid(work)
-						logrus.Infof("[+] Work done %s", key)
+						logrus.Infof("[+] Work completed -> %s", key)
 
 						endTime := time.Now()
 						duration := endTime.Sub(startTime)
